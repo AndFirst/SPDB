@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="pl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Planer trasy</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="container">
+      <div id="controls">
+        <h3>Planer trasy</h3>
+        <button onclick="calculateRoute()">Oblicz trasę</button>
+        <button onclick="clearAll()">Wyczyść</button>
+        <div id="statistics">
+          <div class="route-statistics default">
+            <h4 class="stat-header-default">
+              Statystyki trasy bez minimalizacji liczby lewoskrętów
+            </h4>
+            <p>Czas: <span id="stat-time">-</span> min</p>
+            <p>Dystans: <span id="stat-distance">-</span> km</p>
+            <p>Lewoskręty: <span id="stat-left-turns">-</span></p>
+          </div>
+          <div class="route-statistics optimized">
+            <h4 class="stat-header-optimized">
+              Statystyki trasy z minimalizacją liczby lewoskrętów
+            </h4>
+            <p>Czas: <span id="stat-time-left-turns">-</span> min</p>
+            <p>Dystans: <span id="stat-distance-left-turns">-</span> km</p>
+            <p>Lewoskręty: <span id="stat-left-turns-left-turns">-</span></p>
+          </div>
+        </div>
+        <div id="points-list">
+          <h4>Wybrane punkty</h4>
+          <ul id="points"></ul>
+        </div>
+      </div>
+      <div id="map"></div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>
