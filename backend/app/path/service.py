@@ -2,8 +2,7 @@ import heapq
 import os
 import pickle
 import timeit
-from math import sqrt
-from tracemalloc import start
+from math import atan2, degrees, sqrt
 from typing import Dict, List, Tuple
 
 import networkx as nx
@@ -16,7 +15,7 @@ from .schema import PathRequest, PathResponse, Point, Route, Stats
 class PathService:
     CITY: str = "Warsaw, Poland"
     CACHE_DIR: str = "./cache"
-    CACHE_FILE: str = os.path.join(CACHE_DIR, "warsaw_graph.pkl")  # Zmiana na .pkl
+    CACHE_FILE: str = os.path.join(CACHE_DIR, "warsaw_graph.pkl")
 
     def __init__(self):
         self._city_graph = self._get_city_graph()
@@ -42,11 +41,10 @@ class PathService:
         g = ox.add_edge_speeds(g)
         g = ox.add_edge_travel_times(g)
 
-        # Sprawdzenie atrybutu time
         for u, v, key, data in g.edges(keys=True, data=True):
             if "length" not in data:
                 print(f"Krawędź {u} -> {v} (key={key}) nie ma atrybutu 'length'")
-                data["length"] = data.get("length", 0) / 10  # Domyślna prędkość 36 km/h
+                data["length"] = data.get("length", 0) / 10
 
         try:
             with open(self.CACHE_FILE, "wb") as f:
@@ -58,34 +56,48 @@ class PathService:
         return g
 
     def _greedy_order(
-        self, distances: np.ndarray, start_idx: int
-    ) -> Tuple[List[int], float]:
+        self,
+        distances: np.ndarray,
+        left_turns: np.ndarray,
+        start_idx: int,
+        optimize_left_turns: bool = False,
+    ) -> Tuple[List[int], float, int]:
         n = distances.shape[0]
         if n < 2:
-            return [start_idx], 0.0
+            return [start_idx], 0.0, 0
 
         order = [start_idx]
         visited = {start_idx}
         total_distance = 0.0
+        total_left_turns = 0
 
         while len(order) < n:
             current = order[-1]
-            min_dist = float("inf")
+            min_score = float("inf")
             next_node = None
+            next_distance = 0.0
+            next_left_turns = 0
 
             for i in range(n):
-                if i not in visited and distances[current][i] < min_dist:
-                    min_dist = distances[current][i]
-                    next_node = i
+                if i not in visited:
+                    distance = distances[current][i]
+                    turns = left_turns[current][i] if optimize_left_turns else 0
+                    score = distance + (turns * 10000 if optimize_left_turns else 0)
+                    if score < min_score:
+                        min_score = score
+                        next_node = i
+                        next_distance = distance
+                        next_left_turns = turns
 
             if next_node is None:
                 break
 
             order.append(next_node)
             visited.add(next_node)
-            total_distance += min_dist
+            total_distance += next_distance
+            total_left_turns += next_left_turns
 
-        return order, total_distance
+        return order, total_distance, total_left_turns
 
     def _create_route(
         self,
@@ -99,7 +111,6 @@ class PathService:
             distances[order[i]][order[i + 1]] for i in range(len(order) - 1)
         )
 
-        # Składanie szczegółowej ścieżki
         detailed_path = []
         for i in range(len(order) - 1):
             start_idx, end_idx = order[i], order[i + 1]
@@ -107,17 +118,60 @@ class PathService:
                 (start_idx, end_idx) if start_idx < end_idx else (end_idx, start_idx)
             )
             path = paths.get(path_key, [])
-            # Jeśli ścieżka jest odwrócona, odwróć ją
             if start_idx > end_idx:
                 path = path[::-1]
-            # Dodaj ścieżkę bez ostatniego węzła, aby uniknąć powtórek
             detailed_path.extend(path[:-1] if i < len(order) - 2 else path)
+
+        # Calculate left turns and travel time
+        left_turns = 0
+        total_time = 0.0
+        for i in range(len(detailed_path) - 2):
+            n1, n2, n3 = detailed_path[i], detailed_path[i + 1], detailed_path[i + 2]
+            try:
+                x1, y1 = (
+                    self._city_graph.nodes[n1]["x"],
+                    self._city_graph.nodes[n1]["y"],
+                )
+                x2, y2 = (
+                    self._city_graph.nodes[n2]["x"],
+                    self._city_graph.nodes[n2]["y"],
+                )
+                x3, y3 = (
+                    self._city_graph.nodes[n3]["x"],
+                    self._city_graph.nodes[n3]["y"],
+                )
+
+                # Vectors: v1 = n2->n1, v2 = n2->n3
+                v1 = (x1 - x2, y1 - y2)
+                v2 = (x3 - x2, y3 - y2)
+
+                # Angle between vectors using atan2
+                angle = degrees(atan2(v2[1], v2[0]) - atan2(v1[1], v1[0]))
+                angle = (angle + 360) % 360  # Normalize to [0, 360]
+                if 30 <= angle <= 150:  # Consider as left turn
+                    left_turns += 1
+            except KeyError as e:
+                print(f"Błąd w obliczaniu skrętu: Węzeł {e} nie ma współrzędnych")
+                continue
+
+        # Calculate total travel time
+        for u, v in zip(detailed_path[:-1], detailed_path[1:]):
+            edge_data = self._city_graph.get_edge_data(u, v)
+            if not edge_data:
+                print(f"Brak krawędzi między {u} a {v}")
+                continue
+            # Find the edge with minimum travel time (in case of multiple edges)
+            min_time_edge = min(
+                edge_data.values(), key=lambda x: x.get("travel_time", float("inf"))
+            )
+            travel_time = min_time_edge.get("travel_time", 0.0)
+            total_time += travel_time
 
         points = [
             Point(
                 lat=self._city_graph.nodes[node]["y"],
                 lon=self._city_graph.nodes[node]["x"],
-                is_start=(node == order[0]),
+                is_start=(node == detailed_path[0]),
             )
             for node in detailed_path
         ]
@@ -125,8 +179,8 @@ class PathService:
             path=points,
             stats=Stats(
                 distance=total_distance,
-                time=0.0,
-                left_turns=0,
+                time=total_time,  # Time in seconds
+                left_turns=left_turns,
             ),
         )
 
@@ -135,9 +189,10 @@ class PathService:
 
     def _get_distance_matrix(
         self, landmarks: list[Point]
-    ) -> Tuple[np.ndarray, Dict[Tuple[int, int], List[int]]]:
+    ) -> Tuple[np.ndarray, np.ndarray, Dict[Tuple[int, int], List[int]]]:
         n = len(landmarks)
         distances = np.zeros((n, n))
+        left_turns = np.zeros((n, n), dtype=int)
         paths: Dict[Tuple[int, int], List[int]] = {}
 
         for i in range(n):
@@ -146,8 +201,36 @@ class PathService:
                 distances[i][j] = dist
                 distances[j][i] = dist
                 paths[(i, j)] = path
+                # Calculate left turns for this path
+                turns = 0
+                for k in range(len(path) - 2):
+                    n1, n2, n3 = path[k], path[k + 1], path[k + 2]
+                    try:
+                        x1, y1 = (
+                            self._city_graph.nodes[n1]["x"],
+                            self._city_graph.nodes[n1]["y"],
+                        )
+                        x2, y2 = (
+                            self._city_graph.nodes[n2]["x"],
+                            self._city_graph.nodes[n2]["y"],
+                        )
+                        x3, y3 = (
+                            self._city_graph.nodes[n3]["x"],
+                            self._city_graph.nodes[n3]["y"],
+                        )
 
-        return distances, paths
+                        v1 = (x1 - x2, y1 - y2)
+                        v2 = (x3 - x2, y3 - y2)
+                        angle = degrees(atan2(v2[1], v2[0]) - atan2(v1[1], v1[0]))
+                        angle = (angle + 360) % 360
+                        if 30 <= angle <= 150:
+                            turns += 1
+                    except KeyError:
+                        continue
+                left_turns[i][j] = turns
+                left_turns[j][i] = turns
+
+        return distances, left_turns, paths
 
     def _a_star_distance(self, p1: Point, p2: Point) -> Tuple[float, List[int]]:
         start_time = timeit.default_timer()
@@ -270,7 +353,6 @@ class PathService:
             route = Route(
                 path=[landmarks[0]],
                 stats=Stats(distance=0.0, time=0.0, left_turns=0),
-                detailed_path=[],
             )
             return PathResponse(
                 landmarks=landmarks,
@@ -278,15 +360,26 @@ class PathService:
                 optimized_route=route,
             )
 
-        distances, paths = self._get_distance_matrix(landmarks)
+        distances, left_turns, paths = self._get_distance_matrix(landmarks)
         print_distance_matrix(distances)
 
-        best_order, _ = self._greedy_order(distances, start_idx)
-        optimized_route = self._create_route(best_order, landmarks, distances, paths)
+        # Default route: greedy based on distance only
+        default_order, _, _ = self._greedy_order(
+            distances, left_turns, start_idx, optimize_left_turns=False
+        )
+        default_route = self._create_route(default_order, landmarks, distances, paths)
+
+        # Optimized route: greedy with left turn penalty
+        optimized_order, _, _ = self._greedy_order(
+            distances, left_turns, start_idx, optimize_left_turns=True
+        )
+        optimized_route = self._create_route(
+            optimized_order, landmarks, distances, paths
+        )
 
         return PathResponse(
             landmarks=landmarks,
-            default_route=optimized_route,
+            default_route=default_route,
             optimized_route=optimized_route,
         )
 
