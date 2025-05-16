@@ -14,7 +14,7 @@ def create_app() -> FastAPI:
     return app
 
 
-async def polar_exception_handler(request: Request, exc: Error) -> JSONResponse:
+async def exception_handler(request: Request, exc: Error) -> JSONResponse:
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": type(exc).__name__, "detail": exc.message},
@@ -34,8 +34,8 @@ def configure_cors(app: FastAPI) -> None:
 
 
 def add_exception_handlers(app: FastAPI) -> None:
-    app.add_exception_handler(Error, polar_exception_handler)
-    app.add_exception_handler(RequestValidationError, polar_exception_handler)
+    app.add_exception_handler(Error, exception_handler)
+    app.add_exception_handler(RequestValidationError, exception_handler)
 
 
 app: FastAPI = create_app()

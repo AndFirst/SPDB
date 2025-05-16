@@ -10,7 +10,11 @@ dependencies = [
     "geopy>=2.4.1",
     "networkx>=3.4.2",
     "osmnx>=2.0.2",
+    "overpy>=0.7",
+    "pip>=25.1.1",
     "pydantic-settings>=2.0.3",
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
     "scikit-learn>=1.6.1",
     "uvicorn>=0.34.2",
 ]

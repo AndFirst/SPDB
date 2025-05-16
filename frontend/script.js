@@ -54,10 +54,10 @@ class Point {
 }
 
 class RouteStats {
-  constructor({ distance, time, leftTurns }) {
+  constructor({ distance, time, numYieldDirections }) {
     this.distance = Number(distance);
     this.time = Number(time);
-    this.leftTurns = Number(leftTurns);
+    this.numYieldDirections = Number(numYieldDirections);
     this.validate();
   }
 
@@ -65,13 +65,13 @@ class RouteStats {
     if (
       isNaN(this.distance) ||
       isNaN(this.time) ||
-      isNaN(this.leftTurns) ||
+      isNaN(this.numYieldDirections) ||
       this.distance < 0 ||
       this.time < 0 ||
-      this.leftTurns < 0
+      this.numYieldDirections < 0
     ) {
       throw new Error(
-        "Invalid RouteStats: distance, time, and leftTurns must be non-negative numbers"
+        "Invalid RouteStats: distance, time, and numYieldDirections must be non-negative numbers"
       );
     }
   }
@@ -207,12 +207,12 @@ const UIManager = {
     const defaultStats = state.routes.defaultRoute?.stats || {
       time: 0,
       distance: 0,
-      leftTurns: 0,
+      numYieldDirections: 0,
     };
     const optimizedStats = state.routes.optimizedRoute?.stats || {
       time: 0,
       distance: 0,
-      leftTurns: 0,
+      numYieldDirections: 0,
     };
 
     document.getElementById("stat-time").innerText =
@@ -220,14 +220,14 @@ const UIManager = {
     document.getElementById("stat-distance").innerText =
       defaultStats.distance.toFixed(2);
     document.getElementById("stat-left-turns").innerText =
-      defaultStats.leftTurns;
+      defaultStats.numYieldDirections;
 
     document.getElementById("stat-time-left-turns").innerText =
       optimizedStats.time.toFixed(2);
     document.getElementById("stat-distance-left-turns").innerText =
       optimizedStats.distance.toFixed(2);
     document.getElementById("stat-left-turns-left-turns").innerText =
-      optimizedStats.leftTurns;
+      optimizedStats.numYieldDirections;
 
     this.toggleStatistics(true);
   },

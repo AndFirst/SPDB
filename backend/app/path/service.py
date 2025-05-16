@@ -1,268 +1,373 @@
 import os
 import pickle
-from math import atan2, degrees, sqrt
+from itertools import product
+from multiprocessing import Pool, cpu_count
 from typing import Dict, List, Tuple
-from concurrent.futures import ProcessPoolExecutor
-import time
 
 import networkx as nx
 import numpy as np
 import osmnx as ox
+from app.logger import logger
 
-from .worker_module import compute_distance_and_path, load_graph
+from .a_star import a_star
 from .schema import PathRequest, PathResponse, Point, Route, Stats
+
+IndexPair = Tuple[int, int]
 
 
 class PathService:
-    CITY: str = "Warsaw, Poland"
+    """Service for calculating optimal driving routes between landmarks in a city graph."""
+
+    CITY: str = "Warsaw"
     CACHE_DIR: str = "./cache"
-    CACHE_FILE: str = os.path.join(CACHE_DIR, "warsaw_graph.pkl")
+    CACHE_FILE: str = os.path.join(
+        CACHE_DIR, f"{CITY.lower().replace(', ', '_')}_graph.pkl"
+    )
+    NUM_PROCESSES: int = cpu_count()  # Default to number of CPU cores
 
-    def __init__(self):
-        self._city_graph = self._get_city_graph()
+    def __init__(self, num_processes: int = None):
+        """Initialize PathService with a cached or newly fetched city graph.
 
-    def _get_city_graph(self) -> nx.MultiDiGraph:
+        Args:
+            num_processes: Number of processes to use for parallel A* computation.
+                          Defaults to NUM_PROCESSES if None.
+        """
+        self._city_graph = self._load_city_graph()
+        self.num_processes = (
+            num_processes if num_processes is not None else self.NUM_PROCESSES
+        )
+
+    def _load_city_graph(self) -> nx.MultiDiGraph:
+        """Load city graph from cache or fetch and cache a new one.
+
+        Returns:
+            nx.MultiDiGraph: Directed graph of the city's road network.
+        """
         os.makedirs(self.CACHE_DIR, exist_ok=True)
-
         if os.path.exists(self.CACHE_FILE):
             try:
                 with open(self.CACHE_FILE, "rb") as f:
-                    g = pickle.load(f)
-                if isinstance(g, nx.MultiDiGraph):
-                    print("Graf załadowany z bufora")
-                    return g
-                else:
-                    print(
-                        "Nieprawidłowy format grafu w buforze, pobieranie nowego grafu."
-                    )
+                    graph = pickle.load(f)
+                if isinstance(graph, nx.MultiDiGraph):
+                    return graph
+                logger.warning("Invalid cached graph, fetching new one.")
             except Exception as e:
-                print(f"Błąd podczas wczytywania bufora: {e}, pobieranie nowego grafu.")
+                logger.error(f"Error loading cached graph: {e}")
+        graph = ox.graph_from_place(self.CITY, network_type="drive", simplify=False)
+        graph = ox.add_edge_speeds(graph)
+        graph = ox.add_edge_travel_times(graph)
+        graph = ox.bearing.add_edge_bearings(graph)
+        graph = self._preprocess_graph(graph)  # Fixed method call
+        with open(self.CACHE_FILE, "wb") as f:
+            pickle.dump(graph, f)
+        return graph
 
-        g = ox.graph_from_place(self.CITY, network_type="drive", simplify=False)
-        g = ox.add_edge_speeds(g)
-        g = ox.add_edge_travel_times(g)
+    def _preprocess_graph(self, graph: nx.MultiDiGraph) -> nx.MultiDiGraph:
+        """
+        Preprocesses a directed multigraph by copying nodes and edges with specific attributes.
 
-        for u, v, key, data in g.edges(keys=True, data=True):
-            if "length" not in data:
-                print(f"Krawędź {u} -> {v} (key={key}) nie ma atrybutu 'length'")
-                data["length"] = data.get("length", 0) / 10
+        Creates a new `MultiDiGraph` containing all nodes from the input graph with their
+        `x` and `y` coordinates converted to floats, and all edges with a subset of attributes
+        (`osmid`, `length`, `travel_time`, `speed_kph`, `angle`, `highway`).
 
-        try:
-            with open(self.CACHE_FILE, "wb") as f:
-                pickle.dump(g, f)
-            print(f"Graf zapisany do bufora: {self.CACHE_FILE}")
-        except Exception as e:
-            print(f"Błąd podczas zapisywania grafu do bufora: {e}")
+        Args:
+            graph (nx.MultiDiGraph): The input directed multigraph to preprocess.
 
-        return g
-
-    def _greedy_order(
-        self,
-        distances: np.ndarray,
-        left_turns: np.ndarray,
-        start_idx: int,
-        optimize_left_turns: bool = False,
-    ) -> Tuple[List[int], float, int]:
-        n = distances.shape[0]
-        if n < 2:
-            return [start_idx], 0.0, 0
-
-        order = [start_idx]
-        visited = {start_idx}
-        total_distance = 0.0
-        total_left_turns = 0
-
-        while len(order) < n:
-            current = order[-1]
-            min_score = float("inf")
-            next_node = None
-            next_distance = 0.0
-            next_left_turns = 0
-
-            for i in range(n):
-                if i not in visited:
-                    distance = distances[current][i]
-                    turns = left_turns[current][i] if optimize_left_turns else 0
-                    score = distance + (turns * 10000 if optimize_left_turns else 0)
-                    if score < min_score:
-                        min_score = score
-                        next_node = i
-                        next_distance = distance
-                        next_left_turns = turns
-
-            if next_node is None:
-                break
-
-            order.append(next_node)
-            visited.add(next_node)
-            total_distance += next_distance
-            total_left_turns += next_left_turns
-
-        return order, total_distance, total_left_turns
-
-    def _create_route(
-        self,
-        order: List[int],
-        landmarks: List[Point],
-        distances: np.ndarray,
-        paths: Dict[Tuple[int, int], List[int]],
-    ) -> Route:
-        route_points = [landmarks[i] for i in order]
-        total_distance = sum(
-            distances[order[i]][order[i + 1]] for i in range(len(order) - 1)
+        Returns:
+            nx.MultiDiGraph: A new directed multigraph with copied nodes and edges, including
+                only the specified attributes.
+        """
+        new_graph = nx.MultiDiGraph()
+        new_graph.add_nodes_from(
+            (node_id, {"x": float(data["x"]), "y": float(data["y"])})
+            for node_id, data in graph.nodes(data=True)
         )
-
-        detailed_path = []
-        for i in range(len(order) - 1):
-            start_idx, end_idx = order[i], order[i + 1]
-            path_key = (
-                (start_idx, end_idx) if start_idx < end_idx else (end_idx, start_idx)
+        new_graph.add_edges_from(
+            (
+                from_id,
+                to_id,
+                {
+                    "osmid": data["osmid"],
+                    "length": data["length"],
+                    "travel_time": data["travel_time"],
+                    "speed_kph": data["speed_kph"],
+                    "angle": data["angle"],
+                    "highway": data["highway"],
+                },
             )
-            path = paths.get(path_key, [])
-            if start_idx > end_idx:
-                path = path[::-1]
-            detailed_path.extend(path[:-1] if i < len(order) - 2 else path)
-
-        # Calculate left turns and travel time
-        left_turns = 0
-        total_time = 0.0
-        for i in range(len(detailed_path) - 2):
-            n1, n2, n3 = detailed_path[i], detailed_path[i + 1], detailed_path[i + 2]
-            try:
-                x1, y1 = (
-                    self._city_graph.nodes[n1]["x"],
-                    self._city_graph.nodes[n1]["y"],
-                )
-                x2, y2 = (
-                    self._city_graph.nodes[n2]["x"],
-                    self._city_graph.nodes[n2]["y"],
-                )
-                x3, y3 = (
-                    self._city_graph.nodes[n3]["x"],
-                    self._city_graph.nodes[n3]["y"],
-                )
-
-                # Vectors: v1 = n2->n1, v2 = n2->n3
-                v1 = (x1 - x2, y1 - y2)
-                v2 = (x3 - x2, y3 - y2)
-
-                # Angle between vectors using atan2
-                angle = degrees(atan2(v2[1], v2[0]) - atan2(v1[1], v1[0]))
-                angle = (angle + 360) % 360  # Normalize to [0, 360]
-                if 30 <= angle <= 150:  # Consider as left turn
-                    left_turns += 1
-            except KeyError as e:
-                print(f"Błąd w obliczaniu skrętu: Węzeł {e} nie ma współrzędnych")
-                continue
-
-        # Calculate total travel time
-        for u, v in zip(detailed_path[:-1], detailed_path[1:]):
-            edge_data = self._city_graph.get_edge_data(u, v)
-            if not edge_data:
-                print(f"Brak krawędzi między {u} a {v}")
-                continue
-            # Find the edge with minimum travel time (in case of multiple edges)
-            min_time_edge = min(
-                edge_data.values(), key=lambda x: x.get("travel_time", float("inf"))
-            )
-            travel_time = min_time_edge.get("travel_time", 0.0)
-            total_time += travel_time
-
-        points = [
-            Point(
-                lat=self._city_graph.nodes[node]["y"],
-                lon=self._city_graph.nodes[node]["x"],
-                is_start=(node == detailed_path[0]),
-            )
-            for node in detailed_path
-        ]
-        return Route(
-            path=points,
-            stats=Stats(
-                distance=total_distance,
-                time=total_time,  # Time in seconds
-                left_turns=left_turns,
-            ),
+            for from_id, to_id, data in graph.edges(data=True)
         )
+        return new_graph
 
-    def _euclidean_distance(self, p1: Point, p2: Point) -> float:
-        return sqrt((p1.lat - p2.lat) ** 2 + (p1.lon - p2.lon) ** 2)
+    def _get_start_idx(self, landmarks: List[Point]) -> int:
+        """Get the index of the start point from landmarks.
 
-    def _get_distance_matrix(self, landmarks: list[Point]) -> Tuple[np.ndarray, np.ndarray, Dict[Tuple[int, int], List[int]]]:
-        n = len(landmarks)
-        distances = np.zeros((n, n))
-        left_turns = np.zeros((n, n), dtype=int)
-        paths: Dict[Tuple[int, int], List[int]] = {}
+        Args:
+            landmarks: List of points to search.
 
-        tasks = [(i, j, landmarks[i], landmarks[j]) for i in range(n) for j in range(i+1, n)]
+        Returns:
+            Index of the start point.
 
-        # Przekazujemy tylko ścieżkę do pliku grafu
-        with ProcessPoolExecutor(initializer=load_graph, initargs=(self.CACHE_FILE,)) as executor:
-            results = executor.map(compute_distance_and_path, tasks)
-
-        for i, j, dist, turns, path in results:
-            distances[i][j] = distances[j][i] = dist
-            left_turns[i][j] = left_turns[j][i] = turns
-            paths[(i, j)] = path
-
-        return distances, left_turns, paths
+        Raises:
+            ValueError: If no start point is found or multiple start points exist.
+        """
+        start_idx = next(
+            (i for i, point in enumerate(landmarks) if point.is_start), None
+        )
+        if start_idx is None:
+            raise ValueError("Exactly one landmark must have is_start=True")
+        return start_idx
 
     async def calculate_path(self, request: PathRequest) -> PathResponse:
+        """
+        Calculate default and optimized routes between landmarks.
+
+        Args:
+            request: PathRequest containing list of landmarks with one start point.
+
+        Returns:
+            PathResponse with default and left-turn-optimized routes.
+
+        Raises:
+            ValueError: If fewer than two landmarks or no/invalid start point.
+        """
         landmarks = request.landmarks
-        print(f"Punkty orientacyjne: {[(p.lat, p.lon, p.is_start) for p in landmarks]}")
-        start_points = [i for i, point in enumerate(landmarks) if point.is_start]
-        if len(start_points) != 1:
-            raise ValueError("Exactly one landmark must have is_start=True")
-        start_idx = start_points[0]
-
-        if len(landmarks) < 2:
-            route = Route(
-                path=[landmarks[0]],
-                stats=Stats(distance=0.0, time=0.0, left_turns=0),
-            )
-            return PathResponse(
-                landmarks=landmarks,
-                default_route=route,
-                optimized_route=route,
-            )
-
-        start = time.time()
-
-        distances, left_turns, paths = self._get_distance_matrix(landmarks)
-        print_distance_matrix(distances)
-
-        end = time.time()
-        print(f"Czas wykonania: {end - start:.2f} s")
-
-        # Default route: greedy based on distance only
-        default_order, _, _ = self._greedy_order(
-            distances, left_turns, start_idx, optimize_left_turns=False
-        )
-        default_route = self._create_route(default_order, landmarks, distances, paths)
-
-        # Optimized route: greedy with left turn penalty
-        optimized_order, _, _ = self._greedy_order(
-            distances, left_turns, start_idx, optimize_left_turns=True
+        start_idx = self._get_start_idx(landmarks)
+        default_route = self._create_route(
+            landmarks, start_idx, optimize_yield_directions=False
         )
         optimized_route = self._create_route(
-            optimized_order, landmarks, distances, paths
+            landmarks, start_idx, optimize_yield_directions=True
         )
-
         return PathResponse(
             landmarks=landmarks,
             default_route=default_route,
             optimized_route=optimized_route,
         )
 
+    def _create_route(
+        self,
+        landmarks: List[Point],
+        start_idx: int,
+        optimize_yield_directions: bool = False,
+    ) -> Route:
+        """Creates a route through landmarks using A* pathfinding and greedy ordering.
 
-def print_distance_matrix(distances: np.ndarray):
-    print("Macierz odległości (w formacie %6.2f):")
-    n = distances.shape[0]
-    for i in range(n):
-        row = ""
-        for j in range(n):
-            row += f"{distances[i][j]:6.2f} "
-        print(row)
+        Constructs a route starting from the specified landmark, optimizing either for
+        total travel time or fewer left turns, based on the provided flag. Uses A* to
+        compute paths between landmark pairs and a greedy algorithm to determine the order.
+
+        Args:
+            landmarks: List of points to visit.
+            start_idx: Index of the starting landmark in the landmarks list.
+            optimize_yield_directions: If True, optimizes for fewer left turns; otherwise,
+                optimizes for minimal travel time.
+
+        Returns:
+            Route: A Route object containing the ordered path points and route statistics.
+        """
+        stats, paths = self._compute_stats_and_paths(
+            landmarks, optimize_yield_directions
+        )
+
+        default_stats = Stats(
+            distance=float("inf"), time=float("inf"), num_yield_directions=0
+        )
+
+        cost_key = "distance" if optimize_yield_directions else "time"
+        logger.info(f"Cost key: {cost_key}")
+        cost_matrix = np.array(
+            [
+                [
+                    stats.get((i, j), default_stats).__getattribute__(cost_key)
+                    for j in range(len(landmarks))
+                ]
+                for i in range(len(landmarks))
+            ]
+        )
+
+        order = self._greedy_order(cost_matrix, start_idx)
+
+        # Construct final path and stats
+        path, route_stats = self._construct_path(paths, stats, order)
+
+        return Route(path=path, stats=route_stats)
+
+    def _compute_stats_and_paths(
+        self, landmarks: List[Point], optimize_yield_directions: bool
+    ) -> Tuple[Dict[Tuple[int, int], Stats], Dict[Tuple[int, int], List[int]]]:
+        """Compute paths and stats for all valid landmark pairs using A* pathfinding in parallel.
+
+        Args:
+            landmarks: List of points to calculate paths between.
+            optimize_yield_directions: If True, optimize A* for fewer left turns.
+
+        Returns:
+            Tuple of dictionaries mapping (i,j) pairs to stats and paths.
+        """
+        paths: Dict[IndexPair, List[int]] = {}
+        stats: Dict[IndexPair, Stats] = {}
+        pairs = get_possible_pairs(landmarks)
+        tasks = [
+            (
+                i,
+                j,
+                landmarks[i].lon,
+                landmarks[i].lat,
+                landmarks[j].lon,
+                landmarks[j].lat,
+                optimize_yield_directions,
+            )
+            for i, j in pairs
+        ]
+        import time
+
+        start_time = time.time()
+        with Pool(processes=self.num_processes) as pool:
+            results = pool.starmap(self._compute_path_for_pair, tasks)
+        end_time = time.time()
+        logger.info(f"Pathfinding completed in {end_time - start_time:.2f} seconds")
+        for (i, j), (path, stat) in zip(pairs, results):
+            paths[(i, j)] = path
+            stats[(i, j)] = stat
+            logger.info(f"Path {i}->{j}: {stat}")
+
+        return stats, paths
+
+    def _compute_path_for_pair(
+        self,
+        i: int,
+        j: int,
+        from_lon: float,
+        from_lat: float,
+        to_lon: float,
+        to_lat: float,
+        optimize_yield_directions: bool,
+    ) -> Tuple[List[int], Stats]:
+        """Compute A* path for a single landmark pair.
+
+        Args:
+            i: Index of the starting landmark.
+            j: Index of the ending landmark.
+            from_lon: Longitude of the starting landmark.
+            from_lat: Latitude of the starting landmark.
+            to_lon: Longitude of the ending landmark.
+            to_lat: Latitude of the ending landmark.
+            optimize_yield_directions: If True, optimize for fewer left turns.
+
+        Returns:
+            Tuple of path and stats for the pair.
+        """
+        from_node = ox.nearest_nodes(self._city_graph, from_lon, from_lat)
+        to_node = ox.nearest_nodes(self._city_graph, to_lon, to_lat)
+        path, stat = a_star(
+            self._city_graph,
+            from_node,
+            to_node,
+            optimize_for="time" if optimize_yield_directions else "distance",
+            yield_penalty=1.0,
+        )
+        return path, stat
+
+    def _greedy_order(self, costs: np.ndarray, start_idx: int) -> List[int]:
+        """Determine visit order using greedy nearest-neighbor approach.
+
+        Args:
+            costs: Matrix of costs between landmarks.
+            start_idx: Index of starting landmark.
+
+        Returns:
+            List of landmark indices in visit order.
+        """
+        order = [start_idx]
+        visited = {start_idx}
+        while len(order) < len(costs):
+            current = order[-1]
+            next_idx = np.argmin(
+                [
+                    costs[current, i] if i not in visited else float("inf")
+                    for i in range(len(costs))
+                ]
+            )
+            if next_idx in visited:
+                break
+            order.append(next_idx)
+            visited.add(next_idx)
+        return order
+
+    def _construct_path(
+        self,
+        paths: Dict[Tuple[int, int], List[int]],
+        stats: Dict[Tuple[int, int], Stats],
+        order: List[int],
+    ) -> Tuple[List[Point], Stats]:
+        """Construct full path and stats from ordered segments.
+
+        Args:
+            paths: Dictionary of paths between landmark pairs.
+            stats: Dictionary of stats for each path segment.
+            order: List of landmark indices in visit order.
+
+        Returns:
+            Tuple of path points and aggregated route statistics.
+        """
+        path: List[Point] = []
+        stats_list: List[Stats] = []
+        for start_idx, end_idx in zip(order, order[1:]):
+            segment = paths[(start_idx, end_idx)]
+            path.extend(
+                Point(
+                    lat=self._city_graph.nodes[node]["y"],
+                    lon=self._city_graph.nodes[node]["x"],
+                    is_start=False,
+                )
+                for node in segment
+            )
+            stats_list.append(stats[(start_idx, end_idx)])
+        total_stats = Stats(
+            distance=sum(s.distance for s in stats_list) / 1000,
+            time=sum(s.time for s in stats_list) / 60,
+            num_yield_directions=sum(s.num_yield_directions for s in stats_list),
+        )
+        logger.info(f"Route stats: {total_stats}")
+        return path, total_stats
+
+
+class PathError(Exception):
+    """Base exception for path-related errors."""
+
+
+class TooShortPathError(PathError):
+    """Raised when fewer than two landmarks are provided."""
+
+
+class NoStartPointError(PathError):
+    """Raised when no start point is specified."""
+
+
+def get_possible_pairs(points: List[Point]) -> List[Tuple[int, int]]:
+    """Generate valid index pairs for path calculation.
+
+    Args:
+        points: List of landmarks.
+
+    Returns:
+        List of (i,j) tuples for valid point pairs.
+
+    Raises:
+        TooShortPathError: If fewer than two points.
+        NoStartPointError: If no start point found.
+    """
+    if len(points) < 2:
+        raise TooShortPathError("At least two points required")
+    start_idx = next((i for i, point in enumerate(points) if point.is_start), None)
+    if start_idx is None:
+        raise NoStartPointError("No start point found")
+    return [
+        (i, j)
+        for i, j in product(range(len(points)), repeat=2)
+        if i != j and j != start_idx
+    ]
 
 
 path_service = PathService()

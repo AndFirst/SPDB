@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from fastapi_camelcase import CamelModel
 from pydantic import ConfigDict
 
@@ -17,7 +19,14 @@ class PathRequest(CamelModel):
 class Stats(CamelModel):
     distance: float
     time: float
-    left_turns: int
+    num_yield_directions: int
+
+    def __add__(self, other: Stats) -> Stats:
+        return Stats(
+            distance=self.distance + other.distance,
+            time=self.time + other.time,
+            num_yield_directions=self.num_yield_directions + other.num_yield_directions,
+        )
 
 
 class Route(CamelModel):
