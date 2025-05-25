@@ -1,5 +1,7 @@
+import math
 import os
 import pickle
+import random
 from itertools import product
 from multiprocessing import Pool, cpu_count
 from typing import Dict, List, Tuple
@@ -13,6 +15,16 @@ from .a_star import a_star
 from .schema import PathRequest, PathResponse, Point, Route, Stats
 
 IndexPair = Tuple[int, int]
+
+
+def calculate_angle(x1, y1, x2, y2):
+    angle = math.degrees(math.atan2(x2 - x1, y2 - y1))
+    # Normalize to (-180, 180]
+    if angle > 180:
+        angle -= 360
+    elif angle <= -180:
+        angle += 360
+    return angle * -1
 
 
 class PathService:
@@ -32,85 +44,73 @@ class PathService:
             num_processes: Number of processes to use for parallel A* computation.
                           Defaults to NUM_PROCESSES if None.
         """
-        self._city_graph = self._load_city_graph()
+        self._city_graph_full, self._city_graph_simplified = self._load_city_graphs()
         self.num_processes = (
             num_processes if num_processes is not None else self.NUM_PROCESSES
         )
 
-    def _load_city_graph(self) -> nx.MultiDiGraph:
-        """Load city graph from cache or fetch and cache a new one.
-
-        Returns:
-            nx.MultiDiGraph: Directed graph of the city's road network.
-        """
+    def _load_city_graphs(self) -> Tuple[nx.MultiDiGraph, nx.MultiDiGraph]:
+        """Load full and simplified city graphs from cache or fetch and cache them."""
         os.makedirs(self.CACHE_DIR, exist_ok=True)
-        if os.path.exists(self.CACHE_FILE):
-            try:
-                with open(self.CACHE_FILE, "rb") as f:
-                    graph = pickle.load(f)
-                if isinstance(graph, nx.MultiDiGraph):
-                    return graph
-                logger.warning("Invalid cached graph, fetching new one.")
-            except Exception as e:
-                logger.error(f"Error loading cached graph: {e}")
-        graph = ox.graph_from_place(self.CITY, network_type="drive", simplify=False)
-        graph = ox.add_edge_speeds(graph)
-        graph = ox.add_edge_travel_times(graph)
-        graph = ox.bearing.add_edge_bearings(graph)
-        graph = self._preprocess_graph(graph)  # Fixed method call
-        with open(self.CACHE_FILE, "wb") as f:
-            pickle.dump(graph, f)
-        return graph
+        full_path = os.path.join(self.CACHE_DIR, f"{self.CITY}_full.pkl")
+        simple_path = os.path.join(self.CACHE_DIR, f"{self.CITY}_simple.pkl")
+
+        def load_or_fetch(path, simplify):
+            if os.path.exists(path):
+                try:
+                    with open(path, "rb") as f:
+                        g = pickle.load(f)
+                    if isinstance(g, nx.MultiDiGraph):
+                        return g
+                    logger.warning(f"Invalid cached graph at {path}, refetching.")
+                except Exception as e:
+                    logger.error(f"Error loading {path}: {e}")
+            g = ox.graph_from_place(self.CITY, network_type="drive", simplify=simplify)
+            g = ox.add_edge_speeds(g)
+            g = ox.add_edge_travel_times(g)
+            g = ox.bearing.add_edge_bearings(g)
+            g = self._preprocess_graph(g)
+            with open(path, "wb") as f:
+                pickle.dump(g, f)
+            return g
+
+        return load_or_fetch(full_path, simplify=False), load_or_fetch(
+            simple_path, simplify=True
+        )
 
     def _preprocess_graph(self, graph: nx.MultiDiGraph) -> nx.MultiDiGraph:
-        """
-        Preprocesses a directed multigraph by copying nodes and edges with specific attributes.
-
-        Creates a new `MultiDiGraph` containing all nodes from the input graph with their
-        `x` and `y` coordinates converted to floats, and all edges with a subset of attributes
-        (`osmid`, `length`, `travel_time`, `speed_kph`, `angle`, `highway`).
-
-        Args:
-            graph (nx.MultiDiGraph): The input directed multigraph to preprocess.
-
-        Returns:
-            nx.MultiDiGraph: A new directed multigraph with copied nodes and edges, including
-                only the specified attributes.
-        """
         new_graph = nx.MultiDiGraph()
+        new_graph.graph.update(graph.graph)
         new_graph.add_nodes_from(
             (node_id, {"x": float(data["x"]), "y": float(data["y"])})
             for node_id, data in graph.nodes(data=True)
         )
-        new_graph.add_edges_from(
-            (
-                from_id,
-                to_id,
-                {
-                    "osmid": data["osmid"],
-                    "length": data["length"],
-                    "travel_time": data["travel_time"],
-                    "speed_kph": data["speed_kph"],
-                    "angle": data["angle"],
-                    "highway": data["highway"],
+        for u, v, data in graph.edges(data=True):
+            x1 = graph.nodes[u]["x"]
+            y1 = graph.nodes[u]["y"]
+            x2 = graph.nodes[v]["x"]
+            y2 = graph.nodes[v]["y"]
+            angle = calculate_angle(x1, y1, x2, y2)
+            new_graph.add_edge(
+                u,
+                v,
+                **{
+                    "osmid": tuple(data["osmid"])
+                    if isinstance(data.get("osmid"), list)
+                    else (data["osmid"],)
+                    if not isinstance(data.get("osmid"), tuple)
+                    else data["osmid"],
+                    "length": data.get("length", 0.0),
+                    "travel_time": data.get("travel_time", 0.0),
+                    "speed_kph": data.get("speed_kph", 0.0),
+                    "angle": angle,
+                    "highway": data.get("highway", None),
                 },
             )
-            for from_id, to_id, data in graph.edges(data=True)
-        )
         return new_graph
 
     def _get_start_idx(self, landmarks: List[Point]) -> int:
-        """Get the index of the start point from landmarks.
-
-        Args:
-            landmarks: List of points to search.
-
-        Returns:
-            Index of the start point.
-
-        Raises:
-            ValueError: If no start point is found or multiple start points exist.
-        """
+        """Get the index of the start point from landmarks."""
         start_idx = next(
             (i for i, point in enumerate(landmarks) if point.is_start), None
         )
@@ -119,18 +119,7 @@ class PathService:
         return start_idx
 
     async def calculate_path(self, request: PathRequest) -> PathResponse:
-        """
-        Calculate default and optimized routes between landmarks.
-
-        Args:
-            request: PathRequest containing list of landmarks with one start point.
-
-        Returns:
-            PathResponse with default and left-turn-optimized routes.
-
-        Raises:
-            ValueError: If fewer than two landmarks or no/invalid start point.
-        """
+        """Calculate default and optimized routes between landmarks."""
         landmarks = request.landmarks
         start_idx = self._get_start_idx(landmarks)
         default_route = self._create_route(
@@ -151,31 +140,14 @@ class PathService:
         start_idx: int,
         optimize_yield_directions: bool = False,
     ) -> Route:
-        """Creates a route through landmarks using A* pathfinding and greedy ordering.
-
-        Constructs a route starting from the specified landmark, optimizing either for
-        total travel time or fewer left turns, based on the provided flag. Uses A* to
-        compute paths between landmark pairs and a greedy algorithm to determine the order.
-
-        Args:
-            landmarks: List of points to visit.
-            start_idx: Index of the starting landmark in the landmarks list.
-            optimize_yield_directions: If True, optimizes for fewer left turns; otherwise,
-                optimizes for minimal travel time.
-
-        Returns:
-            Route: A Route object containing the ordered path points and route statistics.
-        """
-        stats, paths = self._compute_stats_and_paths(
-            landmarks, optimize_yield_directions
+        stats, _ = self._compute_stats_and_paths(
+            landmarks, optimize_yield_directions, self._city_graph_simplified
         )
 
         default_stats = Stats(
             distance=float("inf"), time=float("inf"), num_yield_directions=0
         )
-
         cost_key = "distance" if optimize_yield_directions else "time"
-        logger.info(f"Cost key: {cost_key}")
         cost_matrix = np.array(
             [
                 [
@@ -185,28 +157,21 @@ class PathService:
                 for i in range(len(landmarks))
             ]
         )
-
         order = self._greedy_order(cost_matrix, start_idx)
 
-        # Construct final path and stats
+        paths, stats = self._compute_stats_and_paths_from_order(
+            landmarks, order, optimize_yield_directions
+        )
         path, route_stats = self._construct_path(paths, stats, order)
-
         return Route(path=path, stats=route_stats)
 
     def _compute_stats_and_paths(
-        self, landmarks: List[Point], optimize_yield_directions: bool
+        self,
+        landmarks: List[Point],
+        optimize_yield_directions: bool,
+        graph: nx.MultiDiGraph,
     ) -> Tuple[Dict[Tuple[int, int], Stats], Dict[Tuple[int, int], List[int]]]:
-        """Compute paths and stats for all valid landmark pairs using A* pathfinding in parallel.
-
-        Args:
-            landmarks: List of points to calculate paths between.
-            optimize_yield_directions: If True, optimize A* for fewer left turns.
-
-        Returns:
-            Tuple of dictionaries mapping (i,j) pairs to stats and paths.
-        """
-        paths: Dict[IndexPair, List[int]] = {}
-        stats: Dict[IndexPair, Stats] = {}
+        paths, stats = {}, {}
         pairs = get_possible_pairs(landmarks)
         tasks = [
             (
@@ -217,6 +182,7 @@ class PathService:
                 landmarks[j].lon,
                 landmarks[j].lat,
                 optimize_yield_directions,
+                graph,
             )
             for i, j in pairs
         ]
@@ -224,18 +190,36 @@ class PathService:
 
         start_time = time.time()
         with Pool(processes=self.num_processes) as pool:
-            results = pool.starmap(self._compute_path_for_pair, tasks)
+            results = pool.starmap(PathService._compute_path_for_pair_static, tasks)
         end_time = time.time()
-        logger.info(f"Pathfinding completed in {end_time - start_time:.2f} seconds")
+        logger.info(f"Pathfinding (simplified) in {end_time - start_time:.2f} seconds")
         for (i, j), (path, stat) in zip(pairs, results):
             paths[(i, j)] = path
             stats[(i, j)] = stat
-            logger.info(f"Path {i}->{j}: {stat}")
-
         return stats, paths
 
-    def _compute_path_for_pair(
-        self,
+    def _compute_stats_and_paths_from_order(
+        self, landmarks: List[Point], order: List[int], optimize_yield_directions: bool
+    ) -> Tuple[Dict[Tuple[int, int], List[int]], Dict[Tuple[int, int], Stats]]:
+        paths = {}
+        stats = {}
+        for i, j in zip(order, order[1:]):
+            path, stat = self._compute_path_for_pair_static(
+                i,
+                j,
+                landmarks[i].lon,
+                landmarks[i].lat,
+                landmarks[j].lon,
+                landmarks[j].lat,
+                optimize_yield_directions,
+                self._city_graph_full,
+            )
+            paths[(i, j)] = path
+            stats[(i, j)] = stat
+        return paths, stats
+
+    @staticmethod
+    def _compute_path_for_pair_static(
         i: int,
         j: int,
         from_lon: float,
@@ -243,42 +227,21 @@ class PathService:
         to_lon: float,
         to_lat: float,
         optimize_yield_directions: bool,
+        graph: nx.MultiDiGraph,
     ) -> Tuple[List[int], Stats]:
-        """Compute A* path for a single landmark pair.
-
-        Args:
-            i: Index of the starting landmark.
-            j: Index of the ending landmark.
-            from_lon: Longitude of the starting landmark.
-            from_lat: Latitude of the starting landmark.
-            to_lon: Longitude of the ending landmark.
-            to_lat: Latitude of the ending landmark.
-            optimize_yield_directions: If True, optimize for fewer left turns.
-
-        Returns:
-            Tuple of path and stats for the pair.
-        """
-        from_node = ox.nearest_nodes(self._city_graph, from_lon, from_lat)
-        to_node = ox.nearest_nodes(self._city_graph, to_lon, to_lat)
+        from_node = ox.nearest_nodes(graph, from_lon, from_lat)
+        to_node = ox.nearest_nodes(graph, to_lon, to_lat)
         path, stat = a_star(
-            self._city_graph,
+            graph,
             from_node,
             to_node,
             optimize_for="time" if optimize_yield_directions else "distance",
-            yield_penalty=1.0,
+            yield_penalty=30.0,
         )
         return path, stat
 
     def _greedy_order(self, costs: np.ndarray, start_idx: int) -> List[int]:
-        """Determine visit order using greedy nearest-neighbor approach.
-
-        Args:
-            costs: Matrix of costs between landmarks.
-            start_idx: Index of starting landmark.
-
-        Returns:
-            List of landmark indices in visit order.
-        """
+        """Determine visit order using greedy nearest-neighbor approach."""
         order = [start_idx]
         visited = {start_idx}
         while len(order) < len(costs):
@@ -301,24 +264,15 @@ class PathService:
         stats: Dict[Tuple[int, int], Stats],
         order: List[int],
     ) -> Tuple[List[Point], Stats]:
-        """Construct full path and stats from ordered segments.
-
-        Args:
-            paths: Dictionary of paths between landmark pairs.
-            stats: Dictionary of stats for each path segment.
-            order: List of landmark indices in visit order.
-
-        Returns:
-            Tuple of path points and aggregated route statistics.
-        """
+        """Construct full path and stats from ordered segments."""
         path: List[Point] = []
         stats_list: List[Stats] = []
         for start_idx, end_idx in zip(order, order[1:]):
             segment = paths[(start_idx, end_idx)]
             path.extend(
                 Point(
-                    lat=self._city_graph.nodes[node]["y"],
-                    lon=self._city_graph.nodes[node]["x"],
+                    lat=self._city_graph_full.nodes[node]["y"],
+                    lon=self._city_graph_full.nodes[node]["x"],
                     is_start=False,
                 )
                 for node in segment
@@ -346,18 +300,7 @@ class NoStartPointError(PathError):
 
 
 def get_possible_pairs(points: List[Point]) -> List[Tuple[int, int]]:
-    """Generate valid index pairs for path calculation.
-
-    Args:
-        points: List of landmarks.
-
-    Returns:
-        List of (i,j) tuples for valid point pairs.
-
-    Raises:
-        TooShortPathError: If fewer than two points.
-        NoStartPointError: If no start point found.
-    """
+    """Generate valid index pairs for path calculation."""
     if len(points) < 2:
         raise TooShortPathError("At least two points required")
     start_idx = next((i for i, point in enumerate(points) if point.is_start), None)
@@ -370,4 +313,4 @@ def get_possible_pairs(points: List[Point]) -> List[Tuple[int, int]]:
     ]
 
 
-path_service = PathService()
+path_service = PathService(num_processes=4)

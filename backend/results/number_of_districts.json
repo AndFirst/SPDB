@@ -1,0 +1,1141 @@
+{
+    "2": [
+        {
+            "elapsed_time": 8.451640303999739,
+            "optimized_stats": {
+                "distance": 11.540601841631394,
+                "time": 24.312447957045954,
+                "num_yield_directions": 21
+            },
+            "default_stats": {
+                "distance": 10.712073346299583,
+                "time": 41.702226023434086,
+                "num_yield_directions": 57
+            }
+        },
+        {
+            "elapsed_time": 13.176782488000754,
+            "optimized_stats": {
+                "distance": 11.540601841631394,
+                "time": 24.312447957045954,
+                "num_yield_directions": 21
+            },
+            "default_stats": {
+                "distance": 10.712073346299583,
+                "time": 41.702226023434086,
+                "num_yield_directions": 57
+            }
+        },
+        {
+            "elapsed_time": 11.847104364998813,
+            "optimized_stats": {
+                "distance": 11.540601841631394,
+                "time": 24.312447957045954,
+                "num_yield_directions": 21
+            },
+            "default_stats": {
+                "distance": 10.712073346299583,
+                "time": 41.702226023434086,
+                "num_yield_directions": 57
+            }
+        },
+        {
+            "elapsed_time": 11.963858188002632,
+            "optimized_stats": {
+                "distance": 11.540601841631394,
+                "time": 24.312447957045954,
+                "num_yield_directions": 21
+            },
+            "default_stats": {
+                "distance": 10.712073346299583,
+                "time": 41.702226023434086,
+                "num_yield_directions": 57
+            }
+        },
+        {
+            "elapsed_time": 11.827726515002723,
+            "optimized_stats": {
+                "distance": 11.540601841631394,
+                "time": 24.312447957045954,
+                "num_yield_directions": 21
+            },
+            "default_stats": {
+                "distance": 10.712073346299583,
+                "time": 41.702226023434086,
+                "num_yield_directions": 57
+            }
+        }
+    ],
+    "3": [
+        {
+            "elapsed_time": 19.716596777998348,
+            "optimized_stats": {
+                "distance": 28.100389129198046,
+                "time": 58.482363434367265,
+                "num_yield_directions": 57
+            },
+            "default_stats": {
+                "distance": 22.13712973245618,
+                "time": 206.42037590911454,
+                "num_yield_directions": 356
+            }
+        },
+        {
+            "elapsed_time": 17.739355597001122,
+            "optimized_stats": {
+                "distance": 28.100389129198046,
+                "time": 58.482363434367265,
+                "num_yield_directions": 57
+            },
+            "default_stats": {
+                "distance": 22.13712973245618,
+                "time": 206.42037590911454,
+                "num_yield_directions": 356
+            }
+        },
+        {
+            "elapsed_time": 17.658443350999733,
+            "optimized_stats": {
+                "distance": 28.100389129198046,
+                "time": 58.482363434367265,
+                "num_yield_directions": 57
+            },
+            "default_stats": {
+                "distance": 22.13712973245618,
+                "time": 206.42037590911454,
+                "num_yield_directions": 356
+            }
+        },
+        {
+            "elapsed_time": 17.84314634099792,
+            "optimized_stats": {
+                "distance": 28.100389129198046,
+                "time": 58.482363434367265,
+                "num_yield_directions": 57
+            },
+            "default_stats": {
+                "distance": 22.13712973245618,
+                "time": 206.42037590911454,
+                "num_yield_directions": 356
+            }
+        },
+        {
+            "elapsed_time": 17.88888441999734,
+            "optimized_stats": {
+                "distance": 28.100389129198046,
+                "time": 58.482363434367265,
+                "num_yield_directions": 57
+            },
+            "default_stats": {
+                "distance": 22.13712973245618,
+                "time": 206.42037590911454,
+                "num_yield_directions": 356
+            }
+        }
+    ],
+    "4": [
+        {
+            "elapsed_time": 24.15008610299992,
+            "optimized_stats": {
+                "distance": 27.76739629325273,
+                "time": 68.56861487225976,
+                "num_yield_directions": 76
+            },
+            "default_stats": {
+                "distance": 22.292457950424534,
+                "time": 221.33997758455283,
+                "num_yield_directions": 384
+            }
+        },
+        {
+            "elapsed_time": 31.405225343001803,
+            "optimized_stats": {
+                "distance": 27.76739629325273,
+                "time": 68.56861487225976,
+                "num_yield_directions": 76
+            },
+            "default_stats": {
+                "distance": 22.292457950424534,
+                "time": 221.33997758455283,
+                "num_yield_directions": 384
+            }
+        },
+        {
+            "elapsed_time": 31.899014810001972,
+            "optimized_stats": {
+                "distance": 27.76739629325273,
+                "time": 68.56861487225976,
+                "num_yield_directions": 76
+            },
+            "default_stats": {
+                "distance": 22.292457950424534,
+                "time": 221.33997758455283,
+                "num_yield_directions": 384
+            }
+        },
+        {
+            "elapsed_time": 30.74861752799916,
+            "optimized_stats": {
+                "distance": 27.76739629325273,
+                "time": 68.56861487225976,
+                "num_yield_directions": 76
+            },
+            "default_stats": {
+                "distance": 22.292457950424534,
+                "time": 221.33997758455283,
+                "num_yield_directions": 384
+            }
+        },
+        {
+            "elapsed_time": 30.509868016997643,
+            "optimized_stats": {
+                "distance": 27.76739629325273,
+                "time": 68.56861487225976,
+                "num_yield_directions": 76
+            },
+            "default_stats": {
+                "distance": 22.292457950424534,
+                "time": 221.33997758455283,
+                "num_yield_directions": 384
+            }
+        }
+    ],
+    "5": [
+        {
+            "elapsed_time": 33.138348163000046,
+            "optimized_stats": {
+                "distance": 30.582141064121704,
+                "time": 115.86159698494743,
+                "num_yield_directions": 152
+            },
+            "default_stats": {
+                "distance": 29.895124071904306,
+                "time": 165.56225201245294,
+                "num_yield_directions": 253
+            }
+        },
+        {
+            "elapsed_time": 39.463098590997106,
+            "optimized_stats": {
+                "distance": 30.582141064121704,
+                "time": 115.86159698494743,
+                "num_yield_directions": 152
+            },
+            "default_stats": {
+                "distance": 29.895124071904306,
+                "time": 165.56225201245294,
+                "num_yield_directions": 253
+            }
+        },
+        {
+            "elapsed_time": 39.475284460000694,
+            "optimized_stats": {
+                "distance": 30.582141064121704,
+                "time": 115.86159698494743,
+                "num_yield_directions": 152
+            },
+            "default_stats": {
+                "distance": 29.895124071904306,
+                "time": 165.56225201245294,
+                "num_yield_directions": 253
+            }
+        },
+        {
+            "elapsed_time": 39.53763497899854,
+            "optimized_stats": {
+                "distance": 30.582141064121704,
+                "time": 115.86159698494743,
+                "num_yield_directions": 152
+            },
+            "default_stats": {
+                "distance": 29.895124071904306,
+                "time": 165.56225201245294,
+                "num_yield_directions": 253
+            }
+        },
+        {
+            "elapsed_time": 39.379337779006164,
+            "optimized_stats": {
+                "distance": 30.582141064121704,
+                "time": 115.86159698494743,
+                "num_yield_directions": 152
+            },
+            "default_stats": {
+                "distance": 29.895124071904306,
+                "time": 165.56225201245294,
+                "num_yield_directions": 253
+            }
+        }
+    ],
+    "6": [
+        {
+            "elapsed_time": 38.25460808400021,
+            "optimized_stats": {
+                "distance": 48.64471566609962,
+                "time": 153.97569791255268,
+                "num_yield_directions": 191
+            },
+            "default_stats": {
+                "distance": 34.36493162979034,
+                "time": 268.9474925045337,
+                "num_yield_directions": 449
+            }
+        },
+        {
+            "elapsed_time": 44.516401764001785,
+            "optimized_stats": {
+                "distance": 48.64471566609962,
+                "time": 153.97569791255268,
+                "num_yield_directions": 191
+            },
+            "default_stats": {
+                "distance": 34.36493162979034,
+                "time": 268.9474925045337,
+                "num_yield_directions": 449
+            }
+        },
+        {
+            "elapsed_time": 43.96199167300074,
+            "optimized_stats": {
+                "distance": 48.64471566609962,
+                "time": 153.97569791255268,
+                "num_yield_directions": 191
+            },
+            "default_stats": {
+                "distance": 34.36493162979034,
+                "time": 268.9474925045337,
+                "num_yield_directions": 449
+            }
+        },
+        {
+            "elapsed_time": 43.78799190900099,
+            "optimized_stats": {
+                "distance": 48.64471566609962,
+                "time": 153.97569791255268,
+                "num_yield_directions": 191
+            },
+            "default_stats": {
+                "distance": 34.36493162979034,
+                "time": 268.9474925045337,
+                "num_yield_directions": 449
+            }
+        },
+        {
+            "elapsed_time": 43.37142414700065,
+            "optimized_stats": {
+                "distance": 48.64471566609962,
+                "time": 153.97569791255268,
+                "num_yield_directions": 191
+            },
+            "default_stats": {
+                "distance": 34.36493162979034,
+                "time": 268.9474925045337,
+                "num_yield_directions": 449
+            }
+        }
+    ],
+    "7": [
+        {
+            "elapsed_time": 47.85560694999731,
+            "optimized_stats": {
+                "distance": 65.17199710235614,
+                "time": 197.31007372927735,
+                "num_yield_directions": 241
+            },
+            "default_stats": {
+                "distance": 49.19117296144286,
+                "time": 514.3586627103675,
+                "num_yield_directions": 902
+            }
+        },
+        {
+            "elapsed_time": 54.319942461999744,
+            "optimized_stats": {
+                "distance": 65.17199710235614,
+                "time": 197.31007372927735,
+                "num_yield_directions": 241
+            },
+            "default_stats": {
+                "distance": 49.19117296144286,
+                "time": 514.3586627103675,
+                "num_yield_directions": 902
+            }
+        },
+        {
+            "elapsed_time": 54.48358212599851,
+            "optimized_stats": {
+                "distance": 65.17199710235614,
+                "time": 197.31007372927735,
+                "num_yield_directions": 241
+            },
+            "default_stats": {
+                "distance": 49.19117296144286,
+                "time": 514.3586627103675,
+                "num_yield_directions": 902
+            }
+        },
+        {
+            "elapsed_time": 54.29517729700092,
+            "optimized_stats": {
+                "distance": 65.17199710235614,
+                "time": 197.31007372927735,
+                "num_yield_directions": 241
+            },
+            "default_stats": {
+                "distance": 49.19117296144286,
+                "time": 514.3586627103675,
+                "num_yield_directions": 902
+            }
+        },
+        {
+            "elapsed_time": 54.20636723500502,
+            "optimized_stats": {
+                "distance": 65.17199710235614,
+                "time": 197.31007372927735,
+                "num_yield_directions": 241
+            },
+            "default_stats": {
+                "distance": 49.19117296144286,
+                "time": 514.3586627103675,
+                "num_yield_directions": 902
+            }
+        }
+    ],
+    "8": [
+        {
+            "elapsed_time": 54.014727646997926,
+            "optimized_stats": {
+                "distance": 65.20165660051458,
+                "time": 229.51479615082016,
+                "num_yield_directions": 303
+            },
+            "default_stats": {
+                "distance": 52.62786437758603,
+                "time": 530.4819840559281,
+                "num_yield_directions": 924
+            }
+        },
+        {
+            "elapsed_time": 60.299340963996656,
+            "optimized_stats": {
+                "distance": 65.20165660051458,
+                "time": 229.51479615082016,
+                "num_yield_directions": 303
+            },
+            "default_stats": {
+                "distance": 52.62786437758603,
+                "time": 530.4819840559281,
+                "num_yield_directions": 924
+            }
+        },
+        {
+            "elapsed_time": 64.75401061400044,
+            "optimized_stats": {
+                "distance": 65.20165660051458,
+                "time": 229.51479615082016,
+                "num_yield_directions": 303
+            },
+            "default_stats": {
+                "distance": 52.62786437758603,
+                "time": 530.4819840559281,
+                "num_yield_directions": 924
+            }
+        },
+        {
+            "elapsed_time": 60.59091598000305,
+            "optimized_stats": {
+                "distance": 65.20165660051458,
+                "time": 229.51479615082016,
+                "num_yield_directions": 303
+            },
+            "default_stats": {
+                "distance": 52.62786437758603,
+                "time": 530.4819840559281,
+                "num_yield_directions": 924
+            }
+        },
+        {
+            "elapsed_time": 60.37506480999582,
+            "optimized_stats": {
+                "distance": 65.20165660051458,
+                "time": 229.51479615082016,
+                "num_yield_directions": 303
+            },
+            "default_stats": {
+                "distance": 52.62786437758603,
+                "time": 530.4819840559281,
+                "num_yield_directions": 924
+            }
+        }
+    ],
+    "9": [
+        {
+            "elapsed_time": 58.962521801997354,
+            "optimized_stats": {
+                "distance": 74.51789596720295,
+                "time": 256.6831691732581,
+                "num_yield_directions": 337
+            },
+            "default_stats": {
+                "distance": 54.849117836295676,
+                "time": 511.3355793813105,
+                "num_yield_directions": 882
+            }
+        },
+        {
+            "elapsed_time": 70.26801808200253,
+            "optimized_stats": {
+                "distance": 74.51789596720295,
+                "time": 256.6831691732581,
+                "num_yield_directions": 337
+            },
+            "default_stats": {
+                "distance": 54.849117836295676,
+                "time": 511.3355793813105,
+                "num_yield_directions": 882
+            }
+        },
+        {
+            "elapsed_time": 70.08516282200071,
+            "optimized_stats": {
+                "distance": 74.51789596720295,
+                "time": 256.6831691732581,
+                "num_yield_directions": 337
+            },
+            "default_stats": {
+                "distance": 54.849117836295676,
+                "time": 511.3355793813105,
+                "num_yield_directions": 882
+            }
+        },
+        {
+            "elapsed_time": 74.39899646299818,
+            "optimized_stats": {
+                "distance": 74.51789596720295,
+                "time": 256.6831691732581,
+                "num_yield_directions": 337
+            },
+            "default_stats": {
+                "distance": 54.849117836295676,
+                "time": 511.3355793813105,
+                "num_yield_directions": 882
+            }
+        },
+        {
+            "elapsed_time": 69.67188997499761,
+            "optimized_stats": {
+                "distance": 74.51789596720295,
+                "time": 256.6831691732581,
+                "num_yield_directions": 337
+            },
+            "default_stats": {
+                "distance": 54.849117836295676,
+                "time": 511.3355793813105,
+                "num_yield_directions": 882
+            }
+        }
+    ],
+    "10": [
+        {
+            "elapsed_time": 63.12756330800039,
+            "optimized_stats": {
+                "distance": 69.59767387031619,
+                "time": 275.32901359558105,
+                "num_yield_directions": 377
+            },
+            "default_stats": {
+                "distance": 59.155924250891296,
+                "time": 539.6833684245319,
+                "num_yield_directions": 926
+            }
+        },
+        {
+            "elapsed_time": 91.12006376700083,
+            "optimized_stats": {
+                "distance": 69.59767387031619,
+                "time": 275.32901359558105,
+                "num_yield_directions": 377
+            },
+            "default_stats": {
+                "distance": 59.155924250891296,
+                "time": 539.6833684245319,
+                "num_yield_directions": 926
+            }
+        },
+        {
+            "elapsed_time": 75.67286283100111,
+            "optimized_stats": {
+                "distance": 69.59767387031619,
+                "time": 275.32901359558105,
+                "num_yield_directions": 377
+            },
+            "default_stats": {
+                "distance": 59.155924250891296,
+                "time": 539.6833684245319,
+                "num_yield_directions": 926
+            }
+        },
+        {
+            "elapsed_time": 75.98250730500149,
+            "optimized_stats": {
+                "distance": 69.59767387031619,
+                "time": 275.32901359558105,
+                "num_yield_directions": 377
+            },
+            "default_stats": {
+                "distance": 59.155924250891296,
+                "time": 539.6833684245319,
+                "num_yield_directions": 926
+            }
+        },
+        {
+            "elapsed_time": 74.609290468994,
+            "optimized_stats": {
+                "distance": 69.59767387031619,
+                "time": 275.32901359558105,
+                "num_yield_directions": 377
+            },
+            "default_stats": {
+                "distance": 59.155924250891296,
+                "time": 539.6833684245319,
+                "num_yield_directions": 926
+            }
+        }
+    ],
+    "11": [
+        {
+            "elapsed_time": 75.50602516300205,
+            "optimized_stats": {
+                "distance": 82.45022123879811,
+                "time": 296.5836173745873,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 72.8238115512825,
+                "time": 596.8213569746217,
+                "num_yield_directions": 1007
+            }
+        },
+        {
+            "elapsed_time": 106.99218937299884,
+            "optimized_stats": {
+                "distance": 82.45022123879811,
+                "time": 296.5836173745873,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 72.8238115512825,
+                "time": 596.8213569746217,
+                "num_yield_directions": 1007
+            }
+        },
+        {
+            "elapsed_time": 87.39832299699992,
+            "optimized_stats": {
+                "distance": 82.45022123879811,
+                "time": 296.5836173745873,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 72.8238115512825,
+                "time": 596.8213569746217,
+                "num_yield_directions": 1007
+            }
+        },
+        {
+            "elapsed_time": 86.15236781299973,
+            "optimized_stats": {
+                "distance": 82.45022123879811,
+                "time": 296.5836173745873,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 72.8238115512825,
+                "time": 596.8213569746217,
+                "num_yield_directions": 1007
+            }
+        },
+        {
+            "elapsed_time": 85.971365616002,
+            "optimized_stats": {
+                "distance": 82.45022123879811,
+                "time": 296.5836173745873,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 72.8238115512825,
+                "time": 596.8213569746217,
+                "num_yield_directions": 1007
+            }
+        }
+    ],
+    "12": [
+        {
+            "elapsed_time": 75.69524443699993,
+            "optimized_stats": {
+                "distance": 78.86157507334006,
+                "time": 291.11102461801875,
+                "num_yield_directions": 389
+            },
+            "default_stats": {
+                "distance": 63.349308839622694,
+                "time": 541.0714300462118,
+                "num_yield_directions": 921
+            }
+        },
+        {
+            "elapsed_time": 108.61031386600007,
+            "optimized_stats": {
+                "distance": 78.86157507334006,
+                "time": 291.11102461801875,
+                "num_yield_directions": 389
+            },
+            "default_stats": {
+                "distance": 63.349308839622694,
+                "time": 541.0714300462118,
+                "num_yield_directions": 921
+            }
+        },
+        {
+            "elapsed_time": 89.7465202989988,
+            "optimized_stats": {
+                "distance": 78.86157507334006,
+                "time": 291.11102461801875,
+                "num_yield_directions": 389
+            },
+            "default_stats": {
+                "distance": 63.349308839622694,
+                "time": 541.0714300462118,
+                "num_yield_directions": 921
+            }
+        },
+        {
+            "elapsed_time": 88.51946331900035,
+            "optimized_stats": {
+                "distance": 78.86157507334006,
+                "time": 291.11102461801875,
+                "num_yield_directions": 389
+            },
+            "default_stats": {
+                "distance": 63.349308839622694,
+                "time": 541.0714300462118,
+                "num_yield_directions": 921
+            }
+        },
+        {
+            "elapsed_time": 85.4841499250033,
+            "optimized_stats": {
+                "distance": 78.86157507334006,
+                "time": 291.11102461801875,
+                "num_yield_directions": 389
+            },
+            "default_stats": {
+                "distance": 63.349308839622694,
+                "time": 541.0714300462118,
+                "num_yield_directions": 921
+            }
+        }
+    ],
+    "13": [
+        {
+            "elapsed_time": 92.37078931200085,
+            "optimized_stats": {
+                "distance": 83.51303073794293,
+                "time": 302.22564562161915,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 80.16702621492244,
+                "time": 558.0071917790193,
+                "num_yield_directions": 915
+            }
+        },
+        {
+            "elapsed_time": 105.88324595799713,
+            "optimized_stats": {
+                "distance": 83.51303073794293,
+                "time": 302.22564562161915,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 80.16702621492244,
+                "time": 558.0071917790193,
+                "num_yield_directions": 915
+            }
+        },
+        {
+            "elapsed_time": 97.85709188100009,
+            "optimized_stats": {
+                "distance": 83.51303073794293,
+                "time": 302.22564562161915,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 80.16702621492244,
+                "time": 558.0071917790193,
+                "num_yield_directions": 915
+            }
+        },
+        {
+            "elapsed_time": 100.22308940899893,
+            "optimized_stats": {
+                "distance": 83.51303073794293,
+                "time": 302.22564562161915,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 80.16702621492244,
+                "time": 558.0071917790193,
+                "num_yield_directions": 915
+            }
+        },
+        {
+            "elapsed_time": 98.9929534490002,
+            "optimized_stats": {
+                "distance": 83.51303073794293,
+                "time": 302.22564562161915,
+                "num_yield_directions": 398
+            },
+            "default_stats": {
+                "distance": 80.16702621492244,
+                "time": 558.0071917790193,
+                "num_yield_directions": 915
+            }
+        }
+    ],
+    "14": [
+        {
+            "elapsed_time": 111.91225123700133,
+            "optimized_stats": {
+                "distance": 98.83161879581567,
+                "time": 357.78715608168943,
+                "num_yield_directions": 477
+            },
+            "default_stats": {
+                "distance": 84.68806687424772,
+                "time": 597.9208580121085,
+                "num_yield_directions": 985
+            }
+        },
+        {
+            "elapsed_time": 112.25695368200104,
+            "optimized_stats": {
+                "distance": 98.83161879581567,
+                "time": 357.78715608168943,
+                "num_yield_directions": 477
+            },
+            "default_stats": {
+                "distance": 84.68806687424772,
+                "time": 597.9208580121085,
+                "num_yield_directions": 985
+            }
+        },
+        {
+            "elapsed_time": 109.11006357500082,
+            "optimized_stats": {
+                "distance": 98.83161879581567,
+                "time": 357.78715608168943,
+                "num_yield_directions": 477
+            },
+            "default_stats": {
+                "distance": 84.68806687424772,
+                "time": 597.9208580121085,
+                "num_yield_directions": 985
+            }
+        },
+        {
+            "elapsed_time": 108.49958790500386,
+            "optimized_stats": {
+                "distance": 98.83161879581567,
+                "time": 357.78715608168943,
+                "num_yield_directions": 477
+            },
+            "default_stats": {
+                "distance": 84.68806687424772,
+                "time": 597.9208580121085,
+                "num_yield_directions": 985
+            }
+        },
+        {
+            "elapsed_time": 108.02467395100393,
+            "optimized_stats": {
+                "distance": 98.83161879581567,
+                "time": 357.78715608168943,
+                "num_yield_directions": 477
+            },
+            "default_stats": {
+                "distance": 84.68806687424772,
+                "time": 597.9208580121085,
+                "num_yield_directions": 985
+            }
+        }
+    ],
+    "15": [
+        {
+            "elapsed_time": 117.54067376500097,
+            "optimized_stats": {
+                "distance": 100.05387616249851,
+                "time": 369.28483386043644,
+                "num_yield_directions": 497
+            },
+            "default_stats": {
+                "distance": 87.13258160761342,
+                "time": 621.9162135696026,
+                "num_yield_directions": 1027
+            }
+        },
+        {
+            "elapsed_time": 122.96527535000132,
+            "optimized_stats": {
+                "distance": 100.05387616249851,
+                "time": 369.28483386043644,
+                "num_yield_directions": 497
+            },
+            "default_stats": {
+                "distance": 87.13258160761342,
+                "time": 621.9162135696026,
+                "num_yield_directions": 1027
+            }
+        },
+        {
+            "elapsed_time": 117.95074037300219,
+            "optimized_stats": {
+                "distance": 100.05387616249851,
+                "time": 369.28483386043644,
+                "num_yield_directions": 497
+            },
+            "default_stats": {
+                "distance": 87.13258160761342,
+                "time": 621.9162135696026,
+                "num_yield_directions": 1027
+            }
+        },
+        {
+            "elapsed_time": 118.67990539099992,
+            "optimized_stats": {
+                "distance": 100.05387616249851,
+                "time": 369.28483386043644,
+                "num_yield_directions": 497
+            },
+            "default_stats": {
+                "distance": 87.13258160761342,
+                "time": 621.9162135696026,
+                "num_yield_directions": 1027
+            }
+        },
+        {
+            "elapsed_time": 119.38206776000152,
+            "optimized_stats": {
+                "distance": 100.05387616249851,
+                "time": 369.28483386043644,
+                "num_yield_directions": 497
+            },
+            "default_stats": {
+                "distance": 87.13258160761342,
+                "time": 621.9162135696026,
+                "num_yield_directions": 1027
+            }
+        }
+    ],
+    "16": [
+        {
+            "elapsed_time": 127.02196387399817,
+            "optimized_stats": {
+                "distance": 109.2738699699214,
+                "time": 391.7410860816171,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 83.80634881247853,
+                "time": 642.8732402494941,
+                "num_yield_directions": 1073
+            }
+        },
+        {
+            "elapsed_time": 126.93347500399977,
+            "optimized_stats": {
+                "distance": 109.2738699699214,
+                "time": 391.7410860816171,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 83.80634881247853,
+                "time": 642.8732402494941,
+                "num_yield_directions": 1073
+            }
+        },
+        {
+            "elapsed_time": 125.30403378700066,
+            "optimized_stats": {
+                "distance": 109.2738699699214,
+                "time": 391.7410860816171,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 83.80634881247853,
+                "time": 642.8732402494941,
+                "num_yield_directions": 1073
+            }
+        },
+        {
+            "elapsed_time": 123.95159745200363,
+            "optimized_stats": {
+                "distance": 109.2738699699214,
+                "time": 391.7410860816171,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 83.80634881247853,
+                "time": 642.8732402494941,
+                "num_yield_directions": 1073
+            }
+        },
+        {
+            "elapsed_time": 124.32844709400524,
+            "optimized_stats": {
+                "distance": 109.2738699699214,
+                "time": 391.7410860816171,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 83.80634881247853,
+                "time": 642.8732402494941,
+                "num_yield_directions": 1073
+            }
+        }
+    ],
+    "17": [
+        {
+            "elapsed_time": 141.3813560689996,
+            "optimized_stats": {
+                "distance": 131.67602876439008,
+                "time": 411.44720200252704,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 97.05889053247961,
+                "time": 670.7211033140625,
+                "num_yield_directions": 1107
+            }
+        },
+        {
+            "elapsed_time": 143.15322115299932,
+            "optimized_stats": {
+                "distance": 131.67602876439008,
+                "time": 411.44720200252704,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 97.05889053247961,
+                "time": 670.7211033140625,
+                "num_yield_directions": 1107
+            }
+        },
+        {
+            "elapsed_time": 144.25211114700141,
+            "optimized_stats": {
+                "distance": 131.67602876439008,
+                "time": 411.44720200252704,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 97.05889053247961,
+                "time": 670.7211033140625,
+                "num_yield_directions": 1107
+            }
+        },
+        {
+            "elapsed_time": 138.73351287499827,
+            "optimized_stats": {
+                "distance": 131.67602876439008,
+                "time": 411.44720200252704,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 97.05889053247961,
+                "time": 670.7211033140625,
+                "num_yield_directions": 1107
+            }
+        },
+        {
+            "elapsed_time": 140.40310330400098,
+            "optimized_stats": {
+                "distance": 131.67602876439008,
+                "time": 411.44720200252704,
+                "num_yield_directions": 521
+            },
+            "default_stats": {
+                "distance": 97.05889053247961,
+                "time": 670.7211033140625,
+                "num_yield_directions": 1107
+            }
+        }
+    ],
+    "18": [
+        {
+            "elapsed_time": 156.85374063999916,
+            "optimized_stats": {
+                "distance": 132.97264286354672,
+                "time": 536.4663539044108,
+                "num_yield_directions": 764
+            },
+            "default_stats": {
+                "distance": 104.08262717411048,
+                "time": 820.4196455829602,
+                "num_yield_directions": 1389
+            }
+        },
+        {
+            "elapsed_time": 163.89077599499797,
+            "optimized_stats": {
+                "distance": 132.97264286354672,
+                "time": 536.4663539044108,
+                "num_yield_directions": 764
+            },
+            "default_stats": {
+                "distance": 104.08262717411048,
+                "time": 820.4196455829602,
+                "num_yield_directions": 1389
+            }
+        },
+        {
+            "elapsed_time": 159.1044487520012,
+            "optimized_stats": {
+                "distance": 132.97264286354672,
+                "time": 536.4663539044108,
+                "num_yield_directions": 764
+            },
+            "default_stats": {
+                "distance": 104.08262717411048,
+                "time": 820.4196455829602,
+                "num_yield_directions": 1389
+            }
+        },
+        {
+            "elapsed_time": 155.98893793100433,
+            "optimized_stats": {
+                "distance": 132.97264286354672,
+                "time": 536.4663539044108,
+                "num_yield_directions": 764
+            },
+            "default_stats": {
+                "distance": 104.08262717411048,
+                "time": 820.4196455829602,
+                "num_yield_directions": 1389
+            }
+        },
+        {
+            "elapsed_time": 155.85466432500107,
+            "optimized_stats": {
+                "distance": 132.97264286354672,
+                "time": 536.4663539044108,
+                "num_yield_directions": 764
+            },
+            "default_stats": {
+                "distance": 104.08262717411048,
+                "time": 820.4196455829602,
+                "num_yield_directions": 1389
+            }
+        }
+    ]
+}

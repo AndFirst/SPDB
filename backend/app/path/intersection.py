@@ -124,12 +124,16 @@ def count_yield_directions(
 
     result = defaultdict(int)
     for out_edge in out_edges_sorted:
-        result[out_edge[2]["osmid"]] = len(higher_priority_edges)
+        osmid = out_edge[2]["osmid"]
+        if isinstance(osmid, list):
+            osmid = osmid[0]
+        result[osmid] = len(higher_priority_edges)
 
     if out_edges_sorted:
-        result[out_edges_sorted[0][2]["osmid"]] = max(
-            result[out_edges_sorted[0][2]["osmid"]] - 1, 0
-        )
+        osmid = out_edges_sorted[0][2]["osmid"]
+        if isinstance(osmid, list):
+            osmid = osmid[0]
+        result[osmid] = max(result[osmid] - 1, 0)
 
     for out_edge in out_edges_sorted:
         angle_diff_out = angle_diff(in_angle, out_edge[2]["angle"]) - 1
@@ -138,6 +142,9 @@ def count_yield_directions(
             for edge in equal_priority_edges
             if angle_diff(in_angle, edge[2]["angle"]) < angle_diff_out
         ]
-        result[out_edge[2]["osmid"]] += len(edges_to_yield)
+        osmid = out_edge[2]["osmid"]
+        if isinstance(osmid, list):
+            osmid = osmid[0]
+        result[osmid] += len(edges_to_yield)
 
     return dict(result)

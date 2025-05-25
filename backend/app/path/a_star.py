@@ -7,7 +7,7 @@ import networkx as nx
 from .intersection import count_yield_directions
 from .schema import Stats
 
-DEFAULT_YIELD_PENALTY: float = 2.0
+DEFAULT_YIELD_PENALTY: float = 30.0
 OPTIMIZE_DISTANCE: str = "distance"
 OPTIMIZE_TIME: str = "time"
 ALLOWED_OPTIMIZE_FOR: Tuple[str, ...] = (OPTIMIZE_DISTANCE, OPTIMIZE_TIME)

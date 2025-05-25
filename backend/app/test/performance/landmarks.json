@@ -1,0 +1,164 @@
+[
+    {
+        "name": "Muzeum Fryderyka Chopina",
+        "lat": 52.237250,
+        "lon": 21.024750,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Kościół św. Anny",
+        "lat": 52.246250,
+        "lon": 21.013750,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Park Saski",
+        "lat": 52.241000,
+        "lon": 21.005500,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Biblioteka Publiczna m.st. Warszawy",
+        "lat": 52.232750,
+        "lon": 21.021500,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Most Śląsko-Dąbrowski",
+        "lat": 52.250000,
+        "lon": 21.029000,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Ulica Chmielna",
+        "lat": 52.233500,
+        "lon": 21.014250,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Synagoga Nożyków",
+        "lat": 52.237000,
+        "lon": 21.001000,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Pomnik Syreny nad Wisłą",
+        "lat": 52.245500,
+        "lon": 21.033000,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Dom Spotkań z Historią",
+        "lat": 52.227500,
+        "lon": 21.013000,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Pawilon Emilia",
+        "lat": 52.229000,
+        "lon": 21.002500,
+        "district": "Śródmieście"
+    },
+    {
+        "name": "Park Szczęśliwicki",
+        "lat": 52.209444,
+        "lon": 20.961944,
+        "district": "Ochota"
+    },
+    {
+        "name": "Muzeum Powstania Warszawskiego",
+        "lat": 52.232222,
+        "lon": 20.981111,
+        "district": "Wola"
+    },
+    {
+        "name": "Kościół św. Stanisława Kostki",
+        "lat": 52.268056,
+        "lon": 20.986389,
+        "district": "Żoliborz"
+    },
+    {
+        "name": "Park Skaryszewski",
+        "lat": 52.239167,
+        "lon": 21.055833,
+        "district": "Praga-Południe"
+    },
+    {
+        "name": "Muzeum Neonów",
+        "lat": 52.243056,
+        "lon": 21.070833,
+        "district": "Praga-Północ"
+    },
+    {
+        "name": "Kampus Główny Politechniki Warszawskiej",
+        "lat": 52.219722,
+        "lon": 20.998611,
+        "district": "Mokotów"
+    },
+    {
+        "name": "Park Dolinka Służewiecka",
+        "lat": 52.170833,
+        "lon": 21.025278,
+        "district": "Ursynów"
+    },
+    {
+        "name": "Pałac w Wilanowie",
+        "lat": 52.165167,
+        "lon": 21.090556,
+        "district": "Wilanów"
+    },
+    {
+        "name": "Fort Bema",
+        "lat": 52.268889,
+        "lon": 20.947222,
+        "district": "Bemowo"
+    },
+    {
+        "name": "Las Bielański",
+        "lat": 52.291667,
+        "lon": 20.960833,
+        "district": "Bielany"
+    },
+    {
+        "name": "Park Górczewska",
+        "lat": 52.234722,
+        "lon": 20.913056,
+        "district": "Włochy"
+    },
+    {
+        "name": "Rezerwat Przyrody Las Natoliński",
+        "lat": 52.141667,
+        "lon": 21.058333,
+        "district": "Wawer"
+    },
+    {
+        "name": "Kościół św. Katarzyny",
+        "lat": 52.186944,
+        "lon": 21.077222,
+        "district": "Wesoła"
+    },
+    {
+        "name": "Kościół św. Michała Archanioła",
+        "lat": 52.286389,
+        "lon": 21.105833,
+        "district": "Targówek"
+    },
+    {
+        "name": "Park Bródnowski",
+        "lat": 52.290833,
+        "lon": 21.045278,
+        "district": "Białołęka"
+    },
+    {
+        "name": "Rezerwat Przyrody Morysin",
+        "lat": 52.153056,
+        "lon": 21.113889,
+        "district": "Rembertów"
+    },
+    {
+        "name": "Park na Książęcem",
+        "lat": 52.194167,
+        "lon": 20.977222,
+        "district": "Ursus"
+    }
+]

@@ -1,13 +1,7 @@
 import numpy as np
 import pytest
-from app.path.schema import PathRequest, PathResponse, Point, Route, Stats
-from app.path.service import (
-    NoStartPointError,
-    PathService,
-    TooShortPathError,
-    get_empty_matrices,
-    get_possible_pairs,
-)
+from app.path.schema import Point
+from app.path.service import NoStartPointError, TooShortPathError, get_possible_pairs
 
 
 def get_landmarks_mocks(num: int, start_index: int) -> list[Point]:
@@ -62,14 +56,3 @@ def test_get_possible_path_pairs_three_points_with_start_in_middle():
     pairs = get_possible_pairs(points)
 
     assert sorted(pairs) == sorted([(0, 2), (1, 0), (1, 2), (2, 0)])
-
-
-def test_get_empty_matrices():
-    points = get_landmarks_mocks(3, 0)
-    costs, paths = get_empty_matrices(points)
-
-    assert costs.shape == (3, 3)
-    assert np.all(costs == 0)
-
-    assert len(paths) == 4
-    assert all(len(value) == 0 for value in paths.values())

@@ -1,5 +1,0 @@
-1. tylko czas optymalizujemy
-2. pokazanie trasy z minimalizacją i bez(tryb obliczania na raz)
-3. odpowiednia kara za skręt w lewo
-4. uzupełnić algorytm do rozpoznawania skrętu w lewo
-5. sposób wyznaczania kary za skręt w lewo(można uwzględnić rodzaj skrzyżowania lub posiłkować się prędkością)
