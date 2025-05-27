@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 from app.path.schema import Point
 from app.path.service import NoStartPointError, TooShortPathError, get_possible_pairs

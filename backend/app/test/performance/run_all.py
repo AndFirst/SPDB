@@ -1,7 +1,7 @@
 import asyncio
 import os
 
-from .distances import TestDistance
+from .number_of_districts import TestDistance
 from .number_of_nodes import TestNumNodes
 from .number_of_processes import TestNumProcesses
 
