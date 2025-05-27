@@ -1,5 +1,7 @@
 # SPDB
+Do zarządzania zależnościami w projekcie wykorzystano narzędzie `uv` https://github.com/astral-sh/uv
 
+Poniżej opisano sposób uruchamiania poszczególnych elementów aplikacji:
 ## Backend
     cd backend
     uv sync
